@@ -77,6 +77,7 @@ const createUser =catchAsync(async(req:Request,res:Response,next:NextFunction)=>
 // }
 
 
+
 const getAllUsers = catchAsync(async(req:Request,res:Response,next:NextFunction)=> {
     const result = await UserServices.getAllUsers()
      // sendResponse file for repeated komano

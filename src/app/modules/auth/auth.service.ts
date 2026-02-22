@@ -3,8 +3,10 @@ import { IUser } from "../user/user.interface"
 import { User } from "../user/user.model";
 import httpStatus from "http-status-codes"
 import bcryptjs from "bcryptjs"
-import { generateToken } from "../../utils/jwt";
-import { enVars } from "../../config/env";
+import { createNewAccessTokenWRT, createUserTokens } from "../../utils/userToken";
+// import { generateToken, verifyToken } from "../../utils/jwt";
+// import { enVars } from "../../config/env";
+// import { JwtPayload } from "jsonwebtoken";
 
 const credentialsLogin = async(payload: Partial<IUser>) => {
  const {email, password} = payload;
@@ -23,22 +25,39 @@ const credentialsLogin = async(payload: Partial<IUser>) => {
 
 //  27.6 jwt
 
-const jwtPayload = {
-   userId: isUserExist._id,
-   email: isUserExist.email,
-   role: isUserExist.role
-}
+// const jwtPayload = {
+//    userId: isUserExist._id,
+//    email: isUserExist.email,
+//    role: isUserExist.role
+// }
 
-console.log(jwtPayload,"from 32")
 
-const accessToken = generateToken(jwtPayload, enVars.JWT_ACCESS_SECRET, enVars.JWT_ACCESS_EXPIRES)
+// const accessToken = generateToken(jwtPayload, enVars.JWT_ACCESS_SECRET, enVars.JWT_ACCESS_EXPIRES)
+
+// const refreshToken = generateToken(jwtPayload, enVars.JWT_REFRESH_SECRET, enVars.JWT_REFRESH_EXPIRES)
+
+const userTokens = createUserTokens(isUserExist)
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const {password: pass, ...rest } = isUserExist.toObject()
 
  return {
-    accessToken
+    accessToken : userTokens.accessToken,
+    refreshToken : userTokens.refreshToken,
+    user: rest
+ }
+
+}
+const getNewAccessToken = async(refreshToken: string) => {
+   // added other logics in userToken function video 28.4
+ const newAccessToken = await createNewAccessTokenWRT(refreshToken)
+ return {
+    accessToken : newAccessToken
  }
 
 }
 
 export const AuthServices= {
     credentialsLogin,
+    getNewAccessToken
 }
